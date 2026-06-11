@@ -12,6 +12,10 @@
 
 * { box-sizing: border-box; }
 
+html, body {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -19,6 +23,17 @@ body {
   background: var(--bg);
   color: var(--text);
   -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+body.board-scroll-locked {
+  overflow: hidden;
+  touch-action: none;
+}
+
+body.editing {
+  overflow: auto;
+  touch-action: auto;
 }
 
 .app-header {
@@ -40,6 +55,22 @@ p { margin: .25rem 0 0; color: var(--muted); }
 
 main { padding: 1rem; max-width: 1100px; margin: 0 auto; }
 
+body:not(.editing) main {
+  height: calc(100dvh - 92px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body:not(.editing) .sentence-bar {
+  flex: 0 0 auto;
+}
+
+body:not(.editing) .grid {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .toolbar,
 .sentence-bar {
   display: flex;
@@ -52,6 +83,14 @@ main { padding: 1rem; max-width: 1100px; margin: 0 auto; }
   border: 1px solid var(--border);
   border-radius: 18px;
   box-shadow: var(--shadow);
+}
+
+.toolbar[hidden] {
+  display: none;
+}
+
+body.editing .toolbar:not([hidden]) {
+  display: flex;
 }
 
 label { display: grid; gap: .35rem; font-weight: 650; color: var(--text); }
@@ -101,6 +140,17 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .grid {
   display: grid;
   gap: .75rem;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body.editing .grid {
+  touch-action: pan-y;
+}
+
+body:not(.editing) .grid {
+  overflow: hidden;
 }
 
 .aac-button {
@@ -179,6 +229,22 @@ legend { font-weight: 750; }
 .symbol-library { display: flex; gap: .35rem; flex-wrap: wrap; }
 .symbol-library button { background: #f1f2fa; font-size: 1.35rem; padding: .5rem .65rem; }
 .hint { font-size: .9rem; }
+
+
+body:not(.editing) .aac-button {
+  min-height: 0;
+  height: 100%;
+  padding: .45rem;
+  touch-action: none;
+}
+
+body:not(.editing) .button-image img {
+  max-height: min(78px, 11dvh);
+}
+
+body:not(.editing) .button-symbol {
+  font-size: clamp(1.8rem, 8vw, 4rem);
+}
 
 @media (max-width: 680px) {
   .app-header { align-items: flex-start; }

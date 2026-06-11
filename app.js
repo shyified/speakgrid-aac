@@ -20,6 +20,7 @@ let editMode = false;
 let activeIndex = null;
 let tempImage = '';
 let tempSymbol = '';
+let lockedScrollY = 0;
 
 const grid = document.getElementById('grid');
 const editToggle = document.getElementById('editToggle');
@@ -31,6 +32,7 @@ const messageText = document.getElementById('messageText');
 const speakMessage = document.getElementById('speakMessage');
 const clearMessage = document.getElementById('clearMessage');
 const resetBoard = document.getElementById('resetBoard');
+const boardSettings = document.getElementById('boardSettings');
 
 const editorDialog = document.getElementById('editorDialog');
 const editingIndex = document.getElementById('editingIndex');
@@ -80,6 +82,32 @@ function setupSelect(select, min, max, current) {
   }
 }
 
+
+function setBoardScrollLocked(locked) {
+  if (locked) {
+    lockedScrollY = window.scrollY || 0;
+    document.body.classList.add('board-scroll-locked');
+  } else {
+    document.body.classList.remove('board-scroll-locked');
+    window.scrollTo(0, lockedScrollY);
+  }
+}
+
+function setEditMode(enabled) {
+  editMode = enabled;
+  document.body.classList.toggle('editing', editMode);
+  boardSettings.hidden = !editMode;
+  editToggle.textContent = editMode ? 'Done editing' : 'Edit board';
+  editToggle.setAttribute('aria-pressed', String(editMode));
+  setBoardScrollLocked(!editMode);
+  render();
+}
+
+
+function blockBoardScroll(event) {
+  if (!editMode) event.preventDefault();
+}
+
 function render() {
   ensureButtonCount();
   grid.style.gridTemplateColumns = `repeat(${state.columns}, minmax(0, 1fr))`;
@@ -117,11 +145,13 @@ function render() {
     el.append(imageBox, label);
 
     el.addEventListener('pointerdown', event => {
+      if (!editMode) event.preventDefault();
       el.classList.add('pressed');
       if (editMode) return;
       if (state.selection === 'touch') activateButton(index);
     });
     el.addEventListener('pointerup', event => {
+      if (!editMode) event.preventDefault();
       el.classList.remove('pressed');
       if (editMode) openEditor(index);
       else if (state.selection === 'release') activateButton(index);
@@ -221,11 +251,7 @@ function init() {
   rateInput.addEventListener('input', () => { state.rate = Number(rateInput.value); saveState(); });
 
   editToggle.addEventListener('click', () => {
-    editMode = !editMode;
-    document.body.classList.toggle('editing', editMode);
-    editToggle.textContent = editMode ? 'Done editing' : 'Edit board';
-    editToggle.setAttribute('aria-pressed', String(editMode));
-    render();
+    setEditMode(!editMode);
   });
 
   speakMessage.addEventListener('click', () => {
@@ -284,7 +310,10 @@ function init() {
     renderPreview();
   });
 
-  render();
+  grid.addEventListener('touchmove', blockBoardScroll, { passive: false });
+  grid.addEventListener('pointermove', blockBoardScroll, { passive: false });
+
+  setEditMode(false);
 }
 
 init();

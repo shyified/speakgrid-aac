@@ -34,3 +34,10 @@ This app uses the browser's built-in Web Speech API. On iOS, speech must be trig
 Uploaded photos are stored locally in the browser. Large photos can make local storage fill up quickly, so crop/compress images first if needed.
 
 This is not a medical device and is not a replacement for a commercial AAC system when dependable communication access is medically or educationally required.
+
+
+## Update notes
+
+- Board settings are hidden until **Edit board** is selected.
+- In normal communication mode, touch-drag scrolling over the board is disabled so buttons behave more like an AAC grid.
+- In Edit mode, scrolling is re-enabled so the user can reach editing controls and larger boards.
